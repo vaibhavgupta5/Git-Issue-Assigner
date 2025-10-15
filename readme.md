@@ -2,6 +2,8 @@
 
 A multi-agent AI system for automated bug triage and intelligent developer assignment using machine learning and natural language processing.
 
+Full Credits - [Satvik SVG](https://github.com/satvik-svg/)
+
 ---
 
 ## 🚀 Quick Start
@@ -418,3 +420,4 @@ If you encounter issues:
 ```bash
 python launcher.py
 ```
+
