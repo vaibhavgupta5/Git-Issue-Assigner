@@ -1,0 +1,52 @@
+{
+  "developers": [
+    {
+      "id": "dev_satvik_001",
+      "name": "Satvik Srivastava",
+      "github_username": "satvik-svg",
+      "email": "satvik@example.com",
+      "skills": ["Python", "JavaScript", "Java", "Backend", "Frontend", "Database", "API"],
+      "experience_level": "Senior",
+      "max_capacity": 5,
+      "preferred_categories": ["BACKEND", "API", "DATABASE"],
+      "timezone": "UTC",
+      "initial_workload": 1
+    },
+    {
+      "id": "dev_frontend_001", 
+      "name": "Frontend Specialist",
+      "github_username": "frontend-dev",
+      "email": "frontend@example.com",
+      "skills": ["JavaScript", "React", "CSS", "HTML", "Frontend", "Mobile"],
+      "experience_level": "Mid-level",
+      "max_capacity": 4,
+      "preferred_categories": ["FRONTEND", "MOBILE"],
+      "timezone": "UTC",
+      "initial_workload": 2
+    },
+    {
+      "id": "dev_fullstack_001",
+      "name": "Full Stack Developer", 
+      "github_username": "fullstack-dev",
+      "email": "fullstack@example.com",
+      "skills": ["Python", "JavaScript", "React", "Database", "API", "Backend", "Frontend"],
+      "experience_level": "Senior",
+      "max_capacity": 6,
+      "preferred_categories": ["BACKEND", "FRONTEND", "API"],
+      "timezone": "UTC",
+      "initial_workload": 0
+    }
+  ],
+  "assignment_algorithm": {
+    "skill_weight": 0.6,
+    "workload_weight": 0.3,
+    "experience_weight": 0.1,
+    "senior_bonus": 0.2,
+    "mid_level_bonus": 0.1
+  },
+  "monitoring_settings": {
+    "check_interval_seconds": 30,
+    "repository": "satvik-svg/Smart-Bug-Triage-Agent",
+    "issue_states": ["open"]
+  }
+}

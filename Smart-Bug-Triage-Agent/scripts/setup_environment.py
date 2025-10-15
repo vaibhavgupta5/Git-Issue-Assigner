@@ -1,0 +1,168 @@
+#!/usr/bin/env python
+"""Interactive environment setup script for Smart Bug Triage system."""
+
+import os
+import sys
+from pathlib import Path
+import getpass
+
+
+def create_env_file():
+    """Create .env file with user input."""
+    print("🚀 Smart Bug Triage Environment Setup")
+    print("=" * 40)
+    print("This script will help you create a .env file with your configuration.")
+    print("Press Enter to use default values shown in [brackets].\n")
+    
+    env_vars = {}
+    
+    # Database configuration
+    print("📊 Database Configuration")
+    print("-" * 25)
+    env_vars['DB_HOST'] = input("Database host [localhost]: ") or "localhost"
+    env_vars['DB_PORT'] = input("Database port [5432]: ") or "5432"
+    env_vars['DB_NAME'] = input("Database name [smart_bug_triage]: ") or "smart_bug_triage"
+    env_vars['DB_USERNAME'] = input("Database username [postgres]: ") or "postgres"
+    env_vars['DB_PASSWORD'] = getpass.getpass("Database password: ")
+    
+    # GitHub configuration
+    print("\n🐙 GitHub Configuration")
+    print("-" * 22)
+    print("You need a GitHub Personal Access Token with 'repo' and 'read:org' scopes.")
+    env_vars['GITHUB_TOKEN'] = getpass.getpass("GitHub token: ")
+    env_vars['GITHUB_ORGANIZATION'] = input("GitHub organization (optional): ")
+    env_vars['GITHUB_REPOSITORIES'] = input("GitHub repositories (comma-separated, optional): ")
+    
+    # Jira configuration (optional)
+    print("\n🎫 Jira Configuration (Optional)")
+    print("-" * 32)
+    use_jira = input("Do you want to configure Jira? [y/N]: ").lower().startswith('y')
+    if use_jira:
+        env_vars['JIRA_URL'] = input("Jira URL (e.g., https://company.atlassian.net): ")
+        env_vars['JIRA_USERNAME'] = input("Jira username/email: ")
+        env_vars['JIRA_TOKEN'] = getpass.getpass("Jira API token: ")
+        env_vars['JIRA_PROJECTS'] = input("Jira projects (comma-separated, optional): ")
+    
+    # Calendar integration (optional)
+    print("\n📅 Calendar Integration (Optional)")
+    print("-" * 34)
+    use_calendar = input("Do you want to configure calendar integration? [y/N]: ").lower().startswith('y')
+    if use_calendar:
+        env_vars['CALENDAR_INTEGRATION_ENABLED'] = "true"
+        provider = input("Calendar provider [google/outlook]: ").lower()
+        if provider in ['google', 'outlook']:
+            env_vars['CALENDAR_PROVIDER'] = provider
+            
+            if provider == 'google':
+                env_vars['GOOGLE_CALENDAR_CREDENTIALS_PATH'] = input("Google Calendar credentials file path: ")
+            else:  # outlook
+                env_vars['OUTLOOK_CLIENT_ID'] = input("Outlook Client ID: ")
+                env_vars['OUTLOOK_CLIENT_SECRET'] = getpass.getpass("Outlook Client Secret: ")
+                env_vars['OUTLOOK_TENANT_ID'] = input("Outlook Tenant ID: ")
+    else:
+        env_vars['CALENDAR_INTEGRATION_ENABLED'] = "false"
+    
+    # Slack integration (optional)
+    print("\n💬 Slack Integration (Optional)")
+    print("-" * 30)
+    use_slack = input("Do you want to configure Slack notifications? [y/N]: ").lower().startswith('y')
+    if use_slack:
+        env_vars['SLACK_TOKEN'] = getpass.getpass("Slack bot token: ")
+        env_vars['SLACK_WEBHOOK_URL'] = input("Slack webhook URL (optional): ")
+    
+    # Performance tracking
+    print("\n📈 Performance Tracking")
+    print("-" * 23)
+    env_vars['PERFORMANCE_TRACKING_ENABLED'] = "true"
+    env_vars['PERFORMANCE_LOOKBACK_DAYS'] = input("Performance lookback days [90]: ") or "90"
+    
+    # Developer discovery
+    print("\n👥 Developer Discovery")
+    print("-" * 21)
+    env_vars['DEVELOPER_DISCOVERY_ENABLED'] = "true"
+    env_vars['DEVELOPER_DISCOVERY_INTERVAL'] = input("Discovery interval in seconds [86400]: ") or "86400"
+    env_vars['DEVELOPER_MIN_CONTRIBUTIONS'] = input("Minimum contributions [5]: ") or "5"
+    
+    # Logging
+    print("\n📝 Logging Configuration")
+    print("-" * 24)
+    log_level = input("Log level [INFO/DEBUG/WARNING/ERROR]: ").upper() or "INFO"
+    if log_level in ['DEBUG', 'INFO', 'WARNING', 'ERROR']:
+        env_vars['LOG_LEVEL'] = log_level
+    else:
+        env_vars['LOG_LEVEL'] = "INFO"
+    
+    log_file = input("Log file path (optional): ")
+    if log_file:
+        env_vars['LOG_FILE_PATH'] = log_file
+    
+    return env_vars
+
+
+def write_env_file(env_vars):
+    """Write environment variables to .env file."""
+    env_path = Path(".env")
+    
+    if env_path.exists():
+        backup = input(f"\n⚠️  .env file already exists. Create backup? [Y/n]: ")
+        if not backup.lower().startswith('n'):
+            backup_path = Path(".env.backup")
+            env_path.rename(backup_path)
+            print(f"✅ Existing .env backed up to {backup_path}")
+    
+    with open(env_path, 'w') as f:
+        f.write("# Smart Bug Triage Environment Configuration\n")
+        f.write("# Generated by setup script\n\n")
+        
+        # Group related variables
+        groups = {
+            "Database Configuration": ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USERNAME', 'DB_PASSWORD'],
+            "GitHub Configuration": ['GITHUB_TOKEN', 'GITHUB_ORGANIZATION', 'GITHUB_REPOSITORIES'],
+            "Jira Configuration": ['JIRA_URL', 'JIRA_USERNAME', 'JIRA_TOKEN', 'JIRA_PROJECTS'],
+            "Calendar Integration": ['CALENDAR_INTEGRATION_ENABLED', 'CALENDAR_PROVIDER', 'GOOGLE_CALENDAR_CREDENTIALS_PATH', 'OUTLOOK_CLIENT_ID', 'OUTLOOK_CLIENT_SECRET', 'OUTLOOK_TENANT_ID'],
+            "Slack Integration": ['SLACK_TOKEN', 'SLACK_WEBHOOK_URL'],
+            "Performance Tracking": ['PERFORMANCE_TRACKING_ENABLED', 'PERFORMANCE_LOOKBACK_DAYS'],
+            "Developer Discovery": ['DEVELOPER_DISCOVERY_ENABLED', 'DEVELOPER_DISCOVERY_INTERVAL', 'DEVELOPER_MIN_CONTRIBUTIONS'],
+            "Logging": ['LOG_LEVEL', 'LOG_FILE_PATH']
+        }
+        
+        for group_name, var_names in groups.items():
+            group_vars = {k: v for k, v in env_vars.items() if k in var_names and v}
+            if group_vars:
+                f.write(f"# {group_name}\n")
+                for var_name, var_value in group_vars.items():
+                    f.write(f"{var_name}={var_value}\n")
+                f.write("\n")
+    
+    print(f"✅ Environment configuration written to {env_path}")
+
+
+def main():
+    """Main setup function."""
+    try:
+        env_vars = create_env_file()
+        write_env_file(env_vars)
+        
+        print("\n🎉 Environment setup complete!")
+        print("\nNext steps:")
+        print("1. Review and edit .env file if needed")
+        print("2. Run validation: python scripts/validate_config.py")
+        print("3. Set up your database and run migrations")
+        print("4. Start the Smart Bug Triage system")
+        
+        # Offer to run validation
+        run_validation = input("\nRun configuration validation now? [Y/n]: ")
+        if not run_validation.lower().startswith('n'):
+            print("\n" + "=" * 50)
+            os.system("python scripts/validate_config.py")
+        
+    except KeyboardInterrupt:
+        print("\n\n❌ Setup cancelled by user")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n❌ Setup failed: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

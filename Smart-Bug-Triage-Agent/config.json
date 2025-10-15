@@ -1,0 +1,50 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "database": "smart_bug_triage",
+    "username": "postgres",
+    "password": "",
+    "pool_size": 10,
+    "max_overflow": 20
+  },
+  "api": {
+    "github_token": "",
+    "jira_url": "",
+    "jira_username": "",
+    "jira_token": "",
+    "slack_token": "",
+    "slack_webhook_url": "",
+    "rate_limit_requests": 100,
+    "rate_limit_window": 3600
+  },
+  "message_queue": {
+    "host": "localhost",
+    "port": 5672,
+    "username": "guest",
+    "password": "guest",
+    "virtual_host": "/",
+    "exchange_name": "bug_triage",
+    "queue_names": {
+      "new_bugs": "new_bugs_queue",
+      "triaged_bugs": "triaged_bugs_queue",
+      "assignments": "assignments_queue",
+      "notifications": "notifications_queue"
+    }
+  },
+  "agents": {
+    "listener_poll_interval": 30,
+    "triage_batch_size": 10,
+    "developer_status_update_interval": 900,
+    "assignment_timeout": 300,
+    "max_retries": 3,
+    "retry_backoff_factor": 2.0
+  },
+  "logging": {
+    "level": "INFO",
+    "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    "file_path": "logs/smart_bug_triage.log",
+    "max_file_size": 10485760,
+    "backup_count": 5
+  }
+}
